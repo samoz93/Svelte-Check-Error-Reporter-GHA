@@ -57,6 +57,9 @@ try {
     ])
     .addLink("Ok Done!", "https://github.com")
     .write();
+
+  if (errors.length > 0)
+    core.setFailed("Please fix TS errors in your PR before Merging");
 } catch (error) {
   core.setFailed(error.message);
 }
