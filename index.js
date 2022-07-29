@@ -43,6 +43,21 @@ try {
   // Get the JSON webhook payload for the event that triggered the workflow
   const payload = JSON.stringify(github.context.payload, undefined, 2);
   console.log(`The event payload: ${payload}`);
+  core.summary
+    .addHeading("Svelte TS Check Results")
+    .addCodeBlock(generateTestResults(), "js")
+    .addTable([
+      [
+        { data: "errorFile", header: true },
+        { data: "errorType", header: true },
+        { data: "errorLine", header: true },
+        { data: "errorCol", header: true },
+        { data: "errorDesc", header: true },
+      ],
+      ...errors.map((data) => Object.values(data)),
+    ])
+    .addLink("Ok Done!", "https://github.com")
+    .write();
 } catch (error) {
   core.setFailed(error.message);
 }
