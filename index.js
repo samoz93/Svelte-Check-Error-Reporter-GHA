@@ -12,9 +12,11 @@ const checkForLiveErrors = (errorLogs, changedFiles) => {
     console.log("Type of changedFiles is ", typeof changedFiles);
     console.log("Type of errorData is ", typeof errorLogs);
 
+    if (!err || err.length < 1) continue;
+
     const errorFile = santize(err.split(" ")[2]);
     const errorType = santize(err.split(" ")[1]);
-    const location = santize(err.split(" ")[3]);
+    const location = santize(err.split(" ")[3]) || "0:0";
     const errorLine = santize(location.split(":")[0]);
     const errorCol = santize(location.split(":")[1]);
     const errorDesc = santize(
