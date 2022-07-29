@@ -5,14 +5,18 @@ const santize = (str) => {
   if (!str) return "";
   return str.replace(/("\.+\/|\.+\/|")/g, "");
 };
+
 const checkForLiveErrors = (errorLogs, changedFiles) => {
   const liveErrors = [];
 
-  for (const err of errorLogs.split("\n")) {
+  for (const err of errorLogs.split("____")) {
     console.log("Type of changedFiles is ", typeof changedFiles);
     console.log("Type of errorData is ", typeof errorLogs);
 
-    if (!err || err.length < 1) continue;
+    // Make sure we have error
+    if (!err) continue;
+    // Make sure it has 4 segments
+    if (err.split(" ".length < 4)) continue;
 
     const errorFile = santize(err.split(" ")[2]);
     const errorType = santize(err.split(" ")[1]);
