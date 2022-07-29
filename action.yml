@@ -1,0 +1,15 @@
+name: "Svelte TS Check"
+description: "Nothing Much yet"
+inputs:
+  error_data: # id of input
+    description: "The data we got from svelte-check with option of --output=machine"
+    required: true
+    default: ""
+  changed_data: # id of input
+    description: "The list of files in your PR"
+    required: true
+    default: ""
+
+runs:
+  using: "node16"
+  main: "index.js"
