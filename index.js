@@ -2,6 +2,7 @@ const core = require("@actions/core");
 const github = require("@actions/github");
 
 const santize = (str) => {
+  if (!str) return "";
   return str.replace(/("\.+\/|\.+\/|")/g, "");
 };
 const checkForLiveErrors = (errorLogs, changedFiles) => {
