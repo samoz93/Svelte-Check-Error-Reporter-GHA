@@ -45,7 +45,6 @@ try {
   console.log(`The event payload: ${payload}`);
   core.summary
     .addHeading("Svelte TS Check Results")
-    .addCodeBlock(generateTestResults(), "js")
     .addTable([
       [
         { data: "errorFile", header: true },
