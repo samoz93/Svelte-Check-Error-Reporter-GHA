@@ -61,7 +61,9 @@ const init = async () => {
           { data: "errorCol", header: true },
           { data: "errorDesc", header: true },
         ],
-        ...liveErrors.map((data) => Object.values(data)),
+        ...liveErrors
+          .filter((f) => f.errorType == "ERROR")
+          .map((data) => Object.values(data)),
       ])
       .addLink("Ok Done!", "https://github.com")
       .write();
