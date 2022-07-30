@@ -9,7 +9,7 @@ const test = async () => {
   const m = resolve(".");
   console.log(s, m);
 };
-test(0);
+test();
 return;
 const santize = (str) => {
   if (!str) return "";
