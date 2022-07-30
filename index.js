@@ -18,16 +18,9 @@ const santize = (str) => {
 };
 
 const checkForLiveErrors = async (changedFiles) => {
-  const s = await fs.readdir(".");
-  const m = resolve(".");
-  console.log("LOGS", s, m);
-
   const liveErrors = [];
   var errorLogs = await fs.readFile("./log.txt", "utf8");
-  console.log(`ERROR LOGS`, errorLogs);
   for (const err of errorLogs.split("____")) {
-    console.log("Type of changedFiles is ", typeof changedFiles);
-    console.log("Type of errorData is ", typeof errorLogs);
     // Make sure we have error
     if (!err) continue;
     // Make sure it has 4 segments
