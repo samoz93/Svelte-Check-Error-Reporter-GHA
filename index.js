@@ -1,32 +1,24 @@
 const core = require("@actions/core");
 const github = require("@actions/github");
 const fs = require("fs").promises;
-const { resolve } = require("path");
 
-// const test = async () => {
-//   const s = await fs.readdir(".");
-//   const m = resolve(".");
-//   var errorLogs = await fs.readFile("./log.txt", "utf8");
-
-//   console.log(s, m, errorLogs);
-// };
-// test();
-// return;
 const santize = (str) => {
   if (!str) return "";
   return str.replace(/("\.+\/|\.+\/|")/g, "");
 };
 
-const checkForLiveErrors = async (changedFiles) => {
+const checkForLiveErrors = async (errorLogs, changedFiles) => {
   const liveErrors = [];
-  var errorLogs = await fs.readFile("./log.txt", "utf8");
   for (const err of errorLogs.split("____")) {
     // Make sure we have error
     if (!err) continue;
     // Make sure it has 4 segments
-    if (err.split(" ".length < 4)) continue;
-
+    if (err.length < 4) continue;
     const errorFile = santize(err.split(" ")[2]);
+    const errorFileName = errorFile
+      .slice(errorFile.lastIndexOf("\\"))
+      .replace("\\", "");
+
     const errorType = santize(err.split(" ")[1]);
     const location = santize(err.split(" ")[3]) || "0:0";
     const errorLine = santize(location.split(":")[0]);
@@ -35,7 +27,7 @@ const checkForLiveErrors = async (changedFiles) => {
       err.slice(err.indexOf(location) + location.length + 1)
     );
 
-    if (changedFiles.includes(errorFile)) {
+    if (changedFiles.includes(errorFileName)) {
       liveErrors.push({
         errorFile,
         errorType,
@@ -48,33 +40,38 @@ const checkForLiveErrors = async (changedFiles) => {
   console.log("ERRS", liveErrors);
   return liveErrors;
 };
-const writeData = (errs) => {
-  core.setOutput("errors", JSON.stringify(errors, undefined, 2));
-  // Get the JSON webhook payload for the event that triggered the workflow
-  console.log(`The event payload: ${payload}`);
-  core.summary
-    .addHeading("Svelte TS Check Results")
-    .addTable([
-      [
-        { data: "errorFile", header: true },
-        { data: "errorType", header: true },
-        { data: "errorLine", header: true },
-        { data: "errorCol", header: true },
-        { data: "errorDesc", header: true },
-      ],
-      ...errs.map((data) => Object.values(data)),
-    ])
-    .addLink("Ok Done!", "https://github.com")
-    .write();
-  if (errs.filter((f) => f.errorType == "ERROR").length > 0)
-    core.setFailed("Please fix TS errors in your PR before Merging");
+
+const init = async () => {
+  try {
+    // Get changed files list
+    const changedFiles = core.getInput("changed_data", { required: true });
+    // const changedFiles = await fs.readFile("./files.txt", "utf8");
+    // Read errors logs from svelte-check
+    var errorLogs = await fs.readFile("./log.txt", "utf8");
+    // Process the errors and compare them to the changed files
+    const errors = await checkForLiveErrors(errorLogs, changedFiles);
+    // Write a summary about ther errors within our PR files
+    core.summary
+      .addHeading("Svelte TS Check Results")
+      .addTable([
+        [
+          { data: "errorFile", header: true },
+          { data: "errorType", header: true },
+          { data: "errorLine", header: true },
+          { data: "errorCol", header: true },
+          { data: "errorDesc", header: true },
+        ],
+        ...errors.map((data) => Object.values(data)),
+      ])
+      .addLink("Ok Done!", "https://github.com")
+      .write();
+
+    // Report if we have at least one error
+    if (errors.filter((f) => f.errorType == "ERROR").length > 0)
+      core.setFailed("Please fix TS errors in your PR before Merging");
+  } catch (error) {
+    core.setFailed(error.message);
+  }
 };
 
-try {
-  // `who-to-greet` input defined in action metadata file
-  const changedFiles = core.getInput("changed_data", { required: true });
-  const errors = checkForLiveErrors(changedFiles);
-  errors.then(writeData);
-} catch (error) {
-  core.setFailed(error.message);
-}
+init();
