@@ -48,16 +48,6 @@ const checkForLiveErrors = async (changedFiles) => {
   console.log("ERRS", liveErrors);
   return liveErrors;
 };
-
-try {
-  // `who-to-greet` input defined in action metadata file
-  const changedFiles = core.getInput("changed_data", { required: true });
-  const errors = checkForLiveErrors(changedFiles);
-  errors.then(writeData);
-} catch (error) {
-  core.setFailed(error.message);
-}
-
 const writeData = (errs) => {
   core.setOutput("errors", JSON.stringify(errors, undefined, 2));
   // Get the JSON webhook payload for the event that triggered the workflow
@@ -79,3 +69,12 @@ const writeData = (errs) => {
   if (errs.filter((f) => f.errorType == "ERROR").length > 0)
     core.setFailed("Please fix TS errors in your PR before Merging");
 };
+
+try {
+  // `who-to-greet` input defined in action metadata file
+  const changedFiles = core.getInput("changed_data", { required: true });
+  const errors = checkForLiveErrors(changedFiles);
+  errors.then(writeData);
+} catch (error) {
+  core.setFailed(error.message);
+}
