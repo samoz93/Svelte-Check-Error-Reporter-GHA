@@ -27,7 +27,7 @@ const checkForLiveErrors = async (errorLogs, changedFiles) => {
       err.slice(err.indexOf(location) + location.length + 1)
     );
 
-    if (changedFiles.includes(errorFileName)) {
+    if (changedFiles.includes(errorFileName) && errorFile.includes("\\")) {
       liveErrors.push({
         errorFile,
         errorType,
@@ -37,7 +37,7 @@ const checkForLiveErrors = async (errorLogs, changedFiles) => {
       });
     }
   }
-  console.log("ERRS", liveErrors);
+  console.log("ERRS", liveErrors.length, errorLogs.length);
   return liveErrors;
 };
 
@@ -49,7 +49,7 @@ const init = async () => {
     // Read errors logs from svelte-check
     var errorLogs = await fs.readFile("./log.txt", "utf8");
     // Process the errors and compare them to the changed files
-    const errors = await checkForLiveErrors(errorLogs, changedFiles);
+    const liveErrors = await checkForLiveErrors(errorLogs, changedFiles);
     // Write a summary about ther errors within our PR files
     core.summary
       .addHeading("Svelte TS Check Results")
@@ -61,14 +61,16 @@ const init = async () => {
           { data: "errorCol", header: true },
           { data: "errorDesc", header: true },
         ],
-        ...errors.map((data) => Object.values(data)),
+        ...liveErrors.map((data) => Object.values(data)),
       ])
       .addLink("Ok Done!", "https://github.com")
       .write();
 
     // Report if we have at least one error
-    if (errors.filter((f) => f.errorType == "ERROR").length > 0)
-      core.setFailed("Please fix TS errors in your PR before Merging");
+    if (liveErrors.filter((f) => f.errorType == "ERROR").length > 0)
+      core.setFailed(
+        `Please fix ${liveErrors.length} TS errors in your PR before Merging`
+      );
   } catch (error) {
     core.setFailed(error.message);
   }
