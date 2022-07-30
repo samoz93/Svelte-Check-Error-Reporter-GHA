@@ -3,23 +3,27 @@ const github = require("@actions/github");
 const fs = require("fs").promises;
 const { resolve } = require("path");
 
-const test = async () => {
-  const s = await fs.readdir(".");
-  const m = resolve(".");
-  var errorLogs = await fs.readFile("./log.txt", "utf8");
+// const test = async () => {
+//   const s = await fs.readdir(".");
+//   const m = resolve(".");
+//   var errorLogs = await fs.readFile("./log.txt", "utf8");
 
-  console.log(s, m, errorLogs);
-};
-test();
-return;
+//   console.log(s, m, errorLogs);
+// };
+// test();
+// return;
 const santize = (str) => {
   if (!str) return "";
   return str.replace(/("\.+\/|\.+\/|")/g, "");
 };
 
 const checkForLiveErrors = async (changedFiles) => {
+  const s = await fs.readdir(".");
+  const m = resolve(".");
+  console.log("LOGS", s, m);
+
   const liveErrors = [];
-  var errorLogs = await fs.readFile("/tmp/log.txt", "utf8");
+  var errorLogs = await fs.readFile("./log.txt", "utf8");
   console.log(`ERROR LOGS`, errorLogs);
   for (const err of errorLogs.split("____")) {
     console.log("Type of changedFiles is ", typeof changedFiles);
