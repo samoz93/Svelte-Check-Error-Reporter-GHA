@@ -1,6 +1,16 @@
 const core = require("@actions/core");
 const github = require("@actions/github");
+const fs = require("fs").promises;
+const { resolve } = require("path");
 
+console.log(fs.readdir("."));
+const test = async () => {
+  const s = await fs.readdir(".");
+  const m = resolve(".");
+  console.log(s, m);
+};
+test(0);
+return;
 const santize = (str) => {
   if (!str) return "";
   return str.replace(/("\.+\/|\.+\/|")/g, "");
@@ -8,13 +18,11 @@ const santize = (str) => {
 
 const checkForLiveErrors = async (changedFiles) => {
   const liveErrors = [];
-  const fs = require("fs").promises;
   var errorLogs = await fs.readFile("/tmp/log.txt", "utf8");
   console.log(`ERROR LOGS`, errorLogs);
   for (const err of errorLogs.split("____")) {
     console.log("Type of changedFiles is ", typeof changedFiles);
     console.log("Type of errorData is ", typeof errorLogs);
-
     // Make sure we have error
     if (!err) continue;
     // Make sure it has 4 segments
