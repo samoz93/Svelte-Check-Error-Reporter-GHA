@@ -6,7 +6,9 @@ const { resolve } = require("path");
 const test = async () => {
   const s = await fs.readdir(".");
   const m = resolve(".");
-  console.log(s, m);
+  var errorLogs = await fs.readFile("./log.txt", "utf8");
+
+  console.log(s, m, errorLogs);
 };
 test();
 return;
