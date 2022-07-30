@@ -13,7 +13,6 @@ const checkForLiveErrors = async (errorLogs, changedFiles) => {
     // Make sure we have error
     if (!err) continue;
     // Make sure it has 4 segments
-    if (err.length < 4) continue;
     const errorFile = santize(err.split(" ")[2]);
     const errorFileName = errorFile
       .slice(errorFile.lastIndexOf("\\"))
