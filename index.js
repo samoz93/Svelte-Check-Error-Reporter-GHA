@@ -6,9 +6,11 @@ const santize = (str) => {
   return str.replace(/("\.+\/|\.+\/|")/g, "");
 };
 
-const checkForLiveErrors = (errorLogs, changedFiles) => {
+const checkForLiveErrors = async (changedFiles) => {
   const liveErrors = [];
-
+  const fs = require("fs").promises;
+  var errorLogs = await fs.readFile("/tmp/log.txt", "utf8");
+  console.log(`ERROR LOGS`, errorLogs);
   for (const err of errorLogs.split("____")) {
     console.log("Type of changedFiles is ", typeof changedFiles);
     console.log("Type of errorData is ", typeof errorLogs);
@@ -42,9 +44,8 @@ const checkForLiveErrors = (errorLogs, changedFiles) => {
 
 try {
   // `who-to-greet` input defined in action metadata file
-  const errorLogs = core.getInput("error_data", { required: true });
   const changedFiles = core.getInput("changed_data", { required: true });
-  const errors = checkForLiveErrors(errorLogs, changedFiles);
+  const errors = checkForLiveErrors(changedFiles);
   console.log(errors);
   core.setOutput("errors", JSON.stringify(errors, undefined, 2));
   // Get the JSON webhook payload for the event that triggered the workflow
