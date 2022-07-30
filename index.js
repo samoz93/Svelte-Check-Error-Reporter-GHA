@@ -45,6 +45,7 @@ const checkForLiveErrors = async (changedFiles) => {
       });
     }
   }
+  console.log("ERRS", liveErrors);
   return liveErrors;
 };
 
@@ -52,10 +53,14 @@ try {
   // `who-to-greet` input defined in action metadata file
   const changedFiles = core.getInput("changed_data", { required: true });
   const errors = checkForLiveErrors(changedFiles);
-  console.log(errors);
+  errors.then(writeData);
+} catch (error) {
+  core.setFailed(error.message);
+}
+
+const writeData = (errs) => {
   core.setOutput("errors", JSON.stringify(errors, undefined, 2));
   // Get the JSON webhook payload for the event that triggered the workflow
-  const payload = JSON.stringify(github.context.payload, undefined, 2);
   console.log(`The event payload: ${payload}`);
   core.summary
     .addHeading("Svelte TS Check Results")
@@ -67,13 +72,10 @@ try {
         { data: "errorCol", header: true },
         { data: "errorDesc", header: true },
       ],
-      ...errors.map((data) => Object.values(data)),
+      ...errs.map((data) => Object.values(data)),
     ])
     .addLink("Ok Done!", "https://github.com")
     .write();
-
-  if (errors.length > 0)
+  if (errs.filter((f) => f.errorType == "ERROR").length > 0)
     core.setFailed("Please fix TS errors in your PR before Merging");
-} catch (error) {
-  core.setFailed(error.message);
-}
+};
