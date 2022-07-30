@@ -3,7 +3,6 @@ const github = require("@actions/github");
 const fs = require("fs").promises;
 const { resolve } = require("path");
 
-console.log(fs.readdir("."));
 const test = async () => {
   const s = await fs.readdir(".");
   const m = resolve(".");
