@@ -7,9 +7,7 @@ const santize = (str) => {
 };
 
 const acceptableFiles = (file) => {
-  return (
-    ["js", "ts", "svelte"].filter((f) => file.includes(`.${f}`)).length > 0
-  );
+  return ["svelte"].filter((f) => file.includes(`.${f}`)).length > 0;
 };
 
 const ignoreable = (desc) =>
