@@ -11,6 +11,12 @@ const acceptableFiles = (file) => {
     ["js", "ts", "svelte"].filter((f) => file.includes(`.${f}`)).length > 0
   );
 };
+
+const ignoreable = (desc) =>
+  ["semi-colon expected", "at-rule or selector expected"].some((ignore) =>
+    desc.includes(ignore)
+  );
+
 const sepeartor = ",";
 const checkForLiveErrors = (errorLogs, changedFiles) => {
   const liveErrors = [];
@@ -33,7 +39,8 @@ const checkForLiveErrors = (errorLogs, changedFiles) => {
 
     if (
       changedFiles.includes(errorFileName) &&
-      acceptableFiles(errorFileName)
+      acceptableFiles(errorFileName) &&
+      !ignoreable(errorDesc)
     ) {
       liveErrors.push({
         file: errorPath,
@@ -59,7 +66,7 @@ const init = async () => {
     // Process the errors and compare them to the changed files
     const liveErrors = checkForLiveErrors(errorLogs, changedFiles);
 
-    console.log("LIVE ERRORS", liveErrors);
+    console.log("LIVE ERRORS", liveErrors, liveErrors.length);
     // Write a summary about ther errors within our PR files
     core.summary
       .addHeading("Svelte TS Check Results")
