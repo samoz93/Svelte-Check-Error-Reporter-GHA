@@ -79,6 +79,7 @@ const init = async () => {
       .addLink("Ok Done!", "https://github.com")
       .write();
 
+    fs.writeFile("./results.json", JSON.stringify(liveErrors));
     // Report if we have at least one error
     if (liveErrors.filter((f) => f.errorType == "ERROR").length > 0)
       core.setFailed(
