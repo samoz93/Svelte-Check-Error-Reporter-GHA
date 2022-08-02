@@ -1,7 +1,5 @@
 const core = require("@actions/core");
-const github = require("@actions/github");
 const fs = require("fs").promises;
-const ignoreFiles = [".json"];
 
 const santize = (str) => {
   if (!str) return "";
@@ -14,7 +12,6 @@ const acceptableFiles = (file) => {
   );
 };
 const sepeartor = ",";
-let cnt = 0;
 const checkForLiveErrors = (errorLogs, changedFiles) => {
   const liveErrors = [];
   for (const err of errorLogs.split(sepeartor)) {
