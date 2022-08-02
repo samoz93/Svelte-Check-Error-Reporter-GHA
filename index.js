@@ -14,6 +14,7 @@ const acceptableFiles = (file) => {
   );
 };
 const sepeartor = ",";
+let cnt = 0;
 const checkForLiveErrors = (errorLogs, changedFiles) => {
   const liveErrors = [];
   for (const err of errorLogs.split(sepeartor)) {
@@ -21,26 +22,22 @@ const checkForLiveErrors = (errorLogs, changedFiles) => {
     if (!err) continue;
     // Make sure it has 4 segments
     const errorFile = santize(err.split(" ")[2]);
-    const errorFileName = errorFile
-      .slice(errorFile.lastIndexOf("\\"))
-      .replace("\\", "");
+    const errorFileName = errorFile.slice(errorFile.lastIndexOf("/") + 1);
+    const errorPath = changedFiles
+      .split(",")
+      .filter((f) => f.includes(errorFileName))[0];
 
     const errorType = santize(err.split(" ")[1]);
     const location = santize(err.split(" ")[3]) || "0:0";
     const errorLine = santize(location.split(":")[0]);
-    const errorCol = santize(location.split(":")[1]);
     const errorDesc = santize(
       err.slice(err.indexOf(location) + location.length + 1)
     );
 
     if (
       changedFiles.includes(errorFileName) &&
-      errorFile.includes("\\") &&
       acceptableFiles(errorFileName)
     ) {
-      errorPath = changedFiles
-        .split(",")
-        .filter((f) => f.includes(errorFileName))[0];
       liveErrors.push({
         file: errorPath,
         title: errorType,
@@ -59,12 +56,8 @@ const init = async () => {
     // Get changed files list
     // const changedFiles = core.getInput("changed_data", { required: true });
     const changedFiles = await fs.readFile("./changed_files.txt", "utf8");
-    console.log("changedFiles", changedFiles);
-
     // Read errors logs from svelte-check
     var errorLogs = await fs.readFile("./log.txt", "utf8");
-
-    console.log("error logs", errorLogs);
 
     // Process the errors and compare them to the changed files
     const liveErrors = checkForLiveErrors(errorLogs, changedFiles);
