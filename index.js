@@ -15,7 +15,7 @@ const ignoreable = (desc) =>
     desc.includes(ignore)
   );
 
-const sepeartor = ",";
+const sepeartor = "---";
 const checkForLiveErrors = (errorLogs, changedFiles) => {
   const liveErrors = [];
   for (const err of errorLogs.split(sepeartor)) {
