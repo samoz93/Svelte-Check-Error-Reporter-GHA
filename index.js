@@ -14,7 +14,7 @@ const acceptableFiles = (file) => {
   );
 };
 const sepeartor = ",";
-const checkForLiveErrors = async (errorLogs, changedFiles) => {
+const checkForLiveErrors = (errorLogs, changedFiles) => {
   const liveErrors = [];
   for (const err of errorLogs.split(sepeartor)) {
     // Make sure we have error
@@ -59,11 +59,17 @@ const init = async () => {
     // Get changed files list
     // const changedFiles = core.getInput("changed_data", { required: true });
     const changedFiles = await fs.readFile("./changed_files.txt", "utf8");
+    console.log("changedFiles", changedFiles);
+
     // Read errors logs from svelte-check
     var errorLogs = await fs.readFile("./log.txt", "utf8");
+
+    console.log("error logs", errorLogs);
+
     // Process the errors and compare them to the changed files
-    const liveErrors = await checkForLiveErrors(errorLogs, changedFiles);
-    console.log(liveErrors.map((data) => Object.values(data).slice(0, 4)));
+    const liveErrors = checkForLiveErrors(errorLogs, changedFiles);
+
+    console.log("LIVE ERRORS", liveErrors);
     // Write a summary about ther errors within our PR files
     core.summary
       .addHeading("Svelte TS Check Results")
@@ -81,7 +87,7 @@ const init = async () => {
 
     fs.writeFile("./results.json", JSON.stringify(liveErrors));
     // Report if we have at least one error
-    if (liveErrors.filter((f) => f.errorType == "ERROR").length > 0)
+    if (liveErrors.filter((f) => f.annotation_level == "failure").length > 0)
       core.setFailed(
         `Please fix ${liveErrors.length} TS errors in your PR before Merging`
       );
