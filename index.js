@@ -38,7 +38,7 @@ const checkForLiveErrors = (errorLogs, changedFiles) => {
       liveErrors.push({
         file: errorPath,
         title: errorType,
-        line: errorLine,
+        line: +errorLine,
         message: errorDesc,
         annotation_level: errorType === "ERROR" ? "failure" : "warning",
         errorFileName,
