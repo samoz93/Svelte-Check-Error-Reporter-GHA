@@ -61,6 +61,7 @@ const init = async () => {
     // Read errors logs from svelte-check
     var errorLogs = await fs.readFile("./log.txt", "utf8");
 
+    console.log("ERRORs", errorLogs);
     // Process the errors and compare them to the changed files
     const liveErrors = checkForLiveErrors(errorLogs, changedFiles);
 
